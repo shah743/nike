@@ -45,7 +45,11 @@ class Nike::Client
   end
 
   def activities(opts = {})
-    fetch_user_data(opts).activities.map { |a| a.activity }
+    if fetch_user_data(opts).activities
+      fetch_user_data(opts).activities.map { |a| a.activity }
+    else
+      []
+    end
   end
 
   def detailed_activities(opts = {})
