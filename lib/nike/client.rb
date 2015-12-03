@@ -36,6 +36,10 @@ class Nike::Client
     @caching, @cache = opts[:caching] || true, {}
   end
 
+  def check_authentication?
+    self.class.login(@email, @password).present? ? true : false
+  end
+
   def activity(id)
     fetch_activity_data(id.to_s).activity
   end
@@ -94,14 +98,18 @@ private
 
   def login_if_unauthenticated
     return if logged_in?
-    response = self.class.login(@email, @password) 
+    response = self.class.login(@email, @password)
     @user_id = response['serviceResponse']['body']['User']['screenName']
   end
 
   def self.login(email, password)
-    response = post(LOGIN_URL, query: { email: email, password: password }) 
-    self.default_cookies.add_cookies(response.headers['set-cookie'])
-    response
+    response = post(LOGIN_URL, query: { email: email, password: password })
+    if response['serviceResponse']['header']['success'] == 'true'
+      self.default_cookies.add_cookies(response.headers['set-cookie'])
+      response
+    else
+      false
+    end
   end
 
   def logged_in?
