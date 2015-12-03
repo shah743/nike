@@ -36,7 +36,7 @@ class Nike::Client
     @caching, @cache = opts[:caching] || true, {}
   end
 
-  def check_authentication?
+  def valid_user?
     self.class.login(@email, @password).present? ? true : false
   end
 
